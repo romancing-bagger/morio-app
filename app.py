@@ -29,7 +29,7 @@ if os.path.exists('data.csv'):
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
     # --- 画面表示 ---
-    df.set_index(["銘柄CD", "銘柄名"], inplace=True)
+    df.set_index("銘柄CD", inplace=True)
     
     # カンマ表記や小数点制御は Streamlit の column_config を使うのがベストです
     st.data_editor(
