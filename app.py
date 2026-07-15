@@ -48,7 +48,7 @@ if os.path.exists('data.csv'):
         df,
         column_config=config,
         use_container_width=True,
-        height=640
+        height=480
     )
 else:
     st.warning("現在、裏側で初回データを取得中です。数分後にリロードしてください。")
