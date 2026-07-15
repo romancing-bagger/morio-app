@@ -29,7 +29,7 @@ if os.path.exists('data.csv'):
     
     # --- 画面表示 ---
     # インデックスを銘柄CDに設定
-    df.set_index(["銘柄CD","銘柄名"], inplace=True)
+    df.set_index(["銘柄CD","銘柄名",  inplace=True])
     
     # column_configの設定
     config = {
