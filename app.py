@@ -43,7 +43,7 @@ if os.path.exists('data.csv'):
             **{f"{col}(百万)": st.column_config.NumberColumn(format="%,d") for col in million_cols}
         },
         use_container_width=True,
-        height=800
+        height=640
     )
 else:
     st.warning("現在、裏側で初回データを取得中です。数分後にリロードしてください。")
