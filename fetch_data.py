@@ -26,6 +26,14 @@ for i, ticker in enumerate(tickers):
     try:
         stock = yf.Ticker(ticker)
         info = stock.info
+        
+        # 【重要】infoが空（データが取れない）かチェック
+        if not info or 'regularMarketPrice' not in info and 'currentPrice' not in info:
+             # ※一部の環境では info.get('symbol') が取れるかでも判定可能
+             if 'symbol' not in info:
+                 print(f"  -> {ticker} はデータが見つかりません。スキップします。")
+                 continue # 次の銘柄へ
+
         hist = stock.history(period="3mo")
         fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
