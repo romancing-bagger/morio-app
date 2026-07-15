@@ -83,9 +83,9 @@ for i, ticker in enumerate(tickers):
              print(f"  [{ticker}] 財務データ取得スキップ: {e_bs}")
 
         data = {
-            "取得日時": fetch_time,
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
+            "取得日時": fetch_time,
             "セクター": sector,
             "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
