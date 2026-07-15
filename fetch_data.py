@@ -47,7 +47,7 @@ for ticker in tickers:
             vol_ratio25 = vol_today / vol_avg25 if vol_avg25 > 0 else None
         else:
             current_price = info.get('currentPrice')
-            bias25, vol_ratio5, vol_ratio20 = None, None, None
+            bias25, vol_ratio5, vol_ratio25 = None, None, None
 
         total_assets, equity, equity_ratio, turnover, leverage = None, None, None, None, None
         try:
