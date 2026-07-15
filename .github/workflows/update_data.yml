@@ -31,16 +31,14 @@ jobs:
               git config --global user.email "action@github.com"
               git config --global user.name "GitHub Action"
               
-              # 【追加】中途半端な変更があれば強制的にリセットする
-              git reset --hard HEAD
-              
-              # 最新情報を取得（pull）
+              # 最新の状態を取り込む
               git pull --rebase origin main
               
-              # ファイルの追加とコミット
-              if [ -f data.csv ]; then
+              # data.csv がある場合のみ処理
+              if [ -f "data.csv" ]; then
                 git add data.csv
+                # 変更があった時だけコミット
                 git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
               else
-                echo "data.csv が生成されなかったため、スキップします。"
+                echo "data.csv が見つかりません"
               fi
