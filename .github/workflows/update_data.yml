@@ -1,8 +1,9 @@
-name: Auto Fetch Stock Data
+name: Auto Fetch Stock Data2
 
 on:
   # cronium: "0 8 0 0 *"
   # cronium: '*/5 * * * *'
+  
   workflow_dispatch:
 
 jobs:
