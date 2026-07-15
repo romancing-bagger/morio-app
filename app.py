@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 st.set_page_config(layout="wide")
-st.title("ヒリアテーブル（半導体・スイング銘柄分析）")
+st.title("もりおテーブル")
 
 # GitHub Actionが作成したCSVファイルが存在するかチェック
 if os.path.exists('data.csv'):
