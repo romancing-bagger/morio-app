@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 st.set_page_config(layout="wide")
-st.title("🌳")
+st.title("🌳改造中")
 
 # GitHub Actionが作成したCSVファイルが存在するかチェック
 if os.path.exists('data.csv'):
