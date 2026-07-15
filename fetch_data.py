@@ -67,7 +67,7 @@ for ticker in tickers:
         margin = info.get('profitMargins')
 
         data = {
-            "データ取得日時": fetch_time,
+            "取得日時": fetch_time,
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
             "セクター": sector,
