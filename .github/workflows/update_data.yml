@@ -27,7 +27,7 @@ jobs:
         run: python fetch_data.py
         
       - name: Commit and push data.csv
-            run: |
+        run: |
               git config --global user.email "action@github.com"
               git config --global user.name "GitHub Action"
               # data.csvが存在する場合のみ追加・保存の処理を行う
