@@ -6,20 +6,37 @@ from datetime import datetime
 import pytz 
 
 # tickers.txtから銘柄リストを読み込む
+tickers_list = []
 try:
-    with open('tickers.txt', 'r') as f:
-        tickers = [line.strip() for line in f if line.strip()]
+    with open('tickers.txt', 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line: continue
+            
+            # maxsplit=2 で「銘柄CD」「銘柄名」「セクター」の最大3つに分割
+            # スペースが何個あっても、最初の2つの区切り以降はそのまま保持される
+            parts = line.split(maxsplit=2)
+            
+            if len(parts) >= 1:
+                tickers_list.append({
+                    'code': parts[0],
+                    'name': parts[1] if len(parts) > 1 else None,
+                    'sector': parts[2] if len(parts) > 2 else None
+                })
 except FileNotFoundError:
     print("エラー: tickers.txt が見つかりません。")
-    tickers = []
 
 data_list = []
 jst = pytz.timezone('Asia/Tokyo')
 
-for i, ticker in enumerate(tickers):
-    print(f"[{i+1}/{len(tickers)}] {ticker} のデータを取得中...")
+for i, entry in enumerate(tickers_list):
+    ticker = entry['code']
+    manual_name = entry['name']
+    manual_sector = entry['sector']
     
-    # 【追加】計算用変数の初期化（エラー回避のため）
+    print(f"[{i+1}/{len(tickers_list)}] {ticker} のデータを取得中...")
+    
+    # 計算用変数の初期化
     bias5, bias25, vol_ratio5, vol_ratio20 = None, None, None, None
     equity_ratio, turnover, leverage = None, None, None
     
@@ -27,18 +44,14 @@ for i, ticker in enumerate(tickers):
         stock = yf.Ticker(ticker)
         info = stock.info
         
-        # 【重要】infoが空（データが取れない）かチェック
-        if not info or 'regularMarketPrice' not in info and 'currentPrice' not in info:
-             # ※一部の環境では info.get('symbol') が取れるかでも判定可能
-             if 'symbol' not in info:
-                 print(f"  -> {ticker} はデータが見つかりません。スキップします。")
-                 continue # 次の銘柄へ
+        if not info or ('regularMarketPrice' not in info and 'currentPrice' not in info and 'symbol' not in info):
+            print(f"  -> {ticker} はデータが見つかりません。スキップします。")
+            continue
 
         hist = stock.history(period="3mo")
         fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
-        # セクター・業界処理
-        sector = info.get('sector')
+        # 業界処理（yfinance取得データがあれば補完）
         industry = info.get('industry', '-')
         industry_jp = industry
         if "Semiconductor Equipment" in industry:
@@ -49,6 +62,7 @@ for i, ticker in enumerate(tickers):
             industry_jp = "電子部品"
         
         # 株価計算
+        current_price = None
         if not hist.empty and len(hist) >= 25:
             current_price = hist['Close'].iloc[-1]
             sma5 = hist['Close'].rolling(window=5).mean().iloc[-1]
@@ -64,10 +78,10 @@ for i, ticker in enumerate(tickers):
             current_price = info.get('currentPrice')
 
         # 財務データ処理
+        total_assets, equity = None, None
         try:
             bs = stock.balance_sheet
             if not bs.empty:
-                # 取得するキーの揺らぎに対応
                 total_assets = bs.loc['Total Assets'].iloc[0] if 'Total Assets' in bs.index else None
                 equity = bs.loc['Stockholders Equity'].iloc[0] if 'Stockholders Equity' in bs.index else \
                          bs.loc['Total Equity Gross Minority Interest'].iloc[0] if 'Total Equity Gross Minority Interest' in bs.index else None
@@ -80,13 +94,13 @@ for i, ticker in enumerate(tickers):
                 if revenue and total_assets and total_assets != 0:
                     turnover = revenue / total_assets
         except Exception as e_bs:
-             print(f"  [{ticker}] 財務データ取得スキップ: {e_bs}")
+            print(f"  [{ticker}] 財務データ取得スキップ: {e_bs}")
 
         data = {
             "銘柄CD": ticker,
-            "銘柄名": info.get('shortName') or info.get('longName') or "-",
+            "銘柄名": manual_name or info.get('shortName') or info.get('longName') or "-",
+            "セクター": manual_sector or info.get('sector') or "-",
             "取得日時": fetch_time,
-            "セクター": sector,
             "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
@@ -113,8 +127,6 @@ for i, ticker in enumerate(tickers):
     except Exception as e:
         print(f"  -> 致命的なエラー ({ticker}): {e}")
     
-    # 【重要】レート制限回避
-    # 20件ごとに10秒休む。それ以外は1秒待機（トータル時間を短縮）
     if (i + 1) % 20 == 0:
         time.sleep(10)
     else:
@@ -124,11 +136,8 @@ for i, ticker in enumerate(tickers):
 file_path = os.path.join(os.getcwd(), 'data.csv')
 if data_list:
     df = pd.DataFrame(data_list)
-    file_path = os.path.join(os.getcwd(), 'data.csv')
     df.to_csv(file_path, index=False)
-    # ファイルのタイムスタンプを強制的に現在時刻に更新
     os.utime(file_path, None) 
     print(f"完了: {len(data_list)} 件のデータを保存しました。")
 else:
     print("データが取得できませんでした。")
-    pd.DataFrame(columns=["銘柄CD", "銘柄名"]).to_csv(file_path, index=False)
