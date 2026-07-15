@@ -31,18 +31,18 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           
-          # 【最重要】強制リセット：変更が残っていたら全て破棄して、GitHubの最新状態に合わせる
-          git reset --hard HEAD
+          # 1. 最初に最新情報をpullして、環境をGitHubと同期させる
+          git pull origin main
           
-          # 最新の状態を取り込む（競合を避ける）
-          git pull --rebase origin main
+          # 2. ここで fetch_data.py を動かす（これで最新の環境にファイルが作成される）
+          python fetch_data.py
           
-          # data.csv がある場合のみ処理
+          # 3. 作成されたファイルをaddしてコミット・プッシュする
           if [ -f "data.csv" ]; then
             git add data.csv
-            # 変更がある場合のみコミットしてプッシュ
-            git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
+            git commit -m "Auto-update data.csv" || echo "変更なし"
+            git push
           else
-            echo "data.csv が見つかりません"
+            echo "エラー: data.csv が見つかりません"
             exit 1
           fi
