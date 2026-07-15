@@ -22,6 +22,7 @@ for ticker in tickers:
 
         if not hist.empty and len(hist) >= 25:
             current_price = hist['Close'].iloc[-1]
+            sma5 = hist['Close'].rolling(window=5).mean().iloc[-1]
             sma25 = hist['Close'].rolling(window=25).mean().iloc[-1]
             bias5 = ((current_price - sma5) / sma5) * 100
             bias25 = ((current_price - sma25) / sma25) * 100
