@@ -21,6 +21,14 @@ for ticker in tickers:
         hist = stock.history(period="3mo")
         sector = info.get('sector')
         industry = info.get('industry')
+
+        industry_jp = industry
+        if "Semiconductor Equipment" in industry:
+            industry_jp = "装置・材料"
+        elif "Semiconductors" in industry:
+            industry_jp = "半導体メーカー"
+        elif "Electronic Components" in industry:
+            industry_jp = "電子部品"
         
         if not hist.empty and len(hist) >= 25:
             current_price = hist['Close'].iloc[-1]
@@ -61,7 +69,7 @@ for ticker in tickers:
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
             "セクター": sector,
-            "業界": industry,
+            "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "利回(予)": round(div_yield * 100, 2) if div_yield else None,
