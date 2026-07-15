@@ -5,41 +5,41 @@ import os
 st.set_page_config(layout="wide")
 st.title("🌳改造中")
 
-# GitHub Actionが作成したCSVファイルが存在するかチェック
 if os.path.exists('data.csv'):
     df = pd.read_csv('data.csv')
     
-    # --- 数値フォーマットの整形処理 ---
+    # 1. 数値フォーマットの整形
     def to_millions(x):
         return x / 1000000 if pd.notnull(x) else None
 
-    # 各列のフォーマットを適用
-    df['PER(予)'] = df['PER(予)'].round(2)
-    df['PBR(実)'] = df['PBR(実)'].round(2)
-    
-    # 100万単位に変換
     million_cols = ['売上高', '当期純利益', '総資産', '自己資本']
     for col in million_cols:
         df[col] = df[col].apply(to_millions).round(0)
     
-    # 表示用の列名を変更
+    # 列名の変更
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
-    # --- インデックス設定 ---
-    # 銘柄CD と 銘柄名 を両方インデックスに設定（＝横スクロール時に左側に固定）
+    # 2. インデックス設定（これにより銘柄CDと銘柄名が固定される）
     df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
-    # --- 画面表示 ---
+    # 3. カラム設定の準備（エラー防止のため、存在する列のみを辞書にする）
+    # インデックス化した列以外で、かつ百万単位の列だけを抽出して設定
+    target_million_cols = [f"{col}(百万)" for col in million_cols]
+    
+    column_config_dict = {
+        "直近株価": st.column_config.NumberColumn(format="￥%,d"),
+        "目標株価": st.column_config.NumberColumn(format="￥%,d"),
+        "PER(予)": st.column_config.NumberColumn(format="%.2f"),
+        "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
+    }
+    # 百万単位のカラムを追加
+    for col_name in target_million_cols:
+        column_config_dict[col_name] = st.column_config.NumberColumn(format="%,d")
+
+    # 4. 画面表示
     st.data_editor(
         df,
-        column_config={
-            "直近株価": st.column_config.NumberColumn(format="￥%,d"),
-            "目標株価": st.column_config.NumberColumn(format="￥%,d"),
-            "PER(予)": st.column_config.NumberColumn(format="%.2f"),
-            "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
-            **{f"{col}(百万)": st.column_config.NumberColumn(format="%,d") for col in million_cols}
-        },
-        # インデックス列は自動的に編集不可（固定）となります
+        column_config=column_config_dict,
         use_container_width=True,
         height=640
     )
