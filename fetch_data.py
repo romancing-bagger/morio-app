@@ -104,11 +104,11 @@ for ticker in tickers:
 # データが1件以上あればCSVとして保存
 if data_list:
     df = pd.DataFrame(data_list)
-    df.to_csv('data.csv', index=False)
-    print(f"data.csv を作成しました（合計 {len(data_list)} 件）")
+    # 現在のディレクトリに data.csv を保存することを明示
+    file_path = os.path.join(os.getcwd(), 'data.csv')
+    df.to_csv(file_path, index=False)
+    print(f"{file_path} を作成しました（合計 {len(data_list)} 件）")
 else:
-    # 1件も取得できなかった場合は、空のデータフレームを作成して保存する
-    print("データが1件も取得できませんでした。空の data.csv を作成します。")
-    # 最低限の構造だけを持つ空のCSVを作成
-    empty_df = pd.DataFrame(columns=["銘柄コード", "銘柄名"])
-    empty_df.to_csv('data.csv', index=False)
+    print("データが取得できませんでした。")
+    empty_df = pd.DataFrame(columns=["銘柄CD", "銘柄名"])
+    empty_df.to_csv(os.path.join(os.getcwd(), 'data.csv'), index=False)
