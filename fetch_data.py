@@ -21,6 +21,7 @@ for ticker in tickers:
         hist = stock.history(period="3mo")
         sector = info.get('sector')
         industry = info.get('industry')
+        fetch_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         industry_jp = industry
         if "Semiconductor Equipment" in industry:
@@ -66,6 +67,7 @@ for ticker in tickers:
         margin = info.get('profitMargins')
 
         data = {
+            "データ取得日時": fetch_time,
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
             "セクター": sector,
