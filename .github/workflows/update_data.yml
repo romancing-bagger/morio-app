@@ -1,4 +1,4 @@
-name: Auto Fetch Stock Data2
+name: Auto Fetch Stock Data
 
 on:
   # cronium: "0 8 0 0 *"
