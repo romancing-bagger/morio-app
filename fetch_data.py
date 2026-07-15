@@ -92,7 +92,7 @@ for ticker in tickers:
             "移動平均乖離率(5d)": round(bias5, 2) if bias5 else None,
             "移動平均乖離率(25d)": round(bias25, 2) if bias25 else None,
             "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 else None,
-            "出来高(25d)": round(vol_ratio25, 2) if vol_ratio20 else None
+            "出来高(25d)": round(vol_ratio25, 2) if vol_ratio25 else None
         }
         data_list.append(data)
         print(f"  -> {ticker} の取得成功")
