@@ -78,9 +78,6 @@ for i, entry in enumerate(tickers_list):
 
         # 利回り計算（dividendRate ÷ 現在株価 で自前算出）
         dividend_rate = info.get('dividendRate')
-        yield_val = None
-        if dividend_rate and current_price and current_price > 0:
-            yield_val = round((dividend_rate / current_price) * 100, 2)
 
         # 財務データ処理
         total_assets, equity = None, None
@@ -110,7 +107,7 @@ for i, entry in enumerate(tickers_list):
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "ROE(実)": round(roe * 100, 2) if (roe := info.get('returnOnEquity')) else None,
-            "利回(予)": yield_val,
+            "年間配当(予)": dividend_rate,  
             "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
