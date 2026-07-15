@@ -39,6 +39,10 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           
-          # 差分がある場合のみコミット
           git add data.csv
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
+          # 変更がある場合のみコミット
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update data.csv"
+          
+          # 【修正点】--force-with-lease を使う
+          # これは「リモートに自分が見ていない変更がない場合のみ上書きする」という安全な強制プッシュです
+          git push --force-with-lease origin main
