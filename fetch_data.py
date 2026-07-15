@@ -14,18 +14,24 @@ except FileNotFoundError:
     tickers = []
 
 data_list = []
+jst = pytz.timezone('Asia/Tokyo')
 
-for ticker in tickers:
-    print(f"{ticker} のデータを取得中...")
+for i, ticker in enumerate(tickers):
+    print(f"[{i+1}/{len(tickers)}] {ticker} のデータを取得中...")
+    
+    # 【追加】計算用変数の初期化（エラー回避のため）
+    bias5, bias25, vol_ratio5, vol_ratio20 = None, None, None, None
+    equity_ratio, turnover, leverage = None, None, None
+    
     try:
         stock = yf.Ticker(ticker)
         info = stock.info
         hist = stock.history(period="3mo")
-        sector = info.get('sector')
-        industry = info.get('industry')
-        jst = pytz.timezone('Asia/Tokyo')
         fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
+        # セクター・業界処理
+        sector = info.get('sector')
+        industry = info.get('industry', '-')
         industry_jp = industry
         if "Semiconductor Equipment" in industry:
             industry_jp = "装置・材料"
@@ -34,6 +40,7 @@ for ticker in tickers:
         elif "Electronic Components" in industry:
             industry_jp = "電子部品"
         
+        # 株価計算
         if not hist.empty and len(hist) >= 25:
             current_price = hist['Close'].iloc[-1]
             sma5 = hist['Close'].rolling(window=5).mean().iloc[-1]
@@ -47,27 +54,25 @@ for ticker in tickers:
             vol_ratio20 = vol_today / vol_avg20 if vol_avg20 > 0 else None
         else:
             current_price = info.get('currentPrice')
-            bias25, vol_ratio5, vol_ratio20 = None, None, None
 
-        total_assets, equity, equity_ratio, turnover, leverage = None, None, None, None, None
+        # 財務データ処理
         try:
             bs = stock.balance_sheet
             if not bs.empty:
-                if 'Total Assets' in bs.index: total_assets = bs.loc['Total Assets'].iloc[0]
-                if 'Stockholders Equity' in bs.index: equity = bs.loc['Stockholders Equity'].iloc[0]
-                elif 'Total Equity Gross Minority Interest' in bs.index: equity = bs.loc['Total Equity Gross Minority Interest'].iloc[0]
+                # 取得するキーの揺らぎに対応
+                total_assets = bs.loc['Total Assets'].iloc[0] if 'Total Assets' in bs.index else None
+                equity = bs.loc['Stockholders Equity'].iloc[0] if 'Stockholders Equity' in bs.index else \
+                         bs.loc['Total Equity Gross Minority Interest'].iloc[0] if 'Total Equity Gross Minority Interest' in bs.index else None
+                
                 if total_assets and equity:
                     equity_ratio = (equity / total_assets) * 100
                     leverage = total_assets / equity
+                
                 revenue = info.get('totalRevenue')
-                if revenue and total_assets:
+                if revenue and total_assets and total_assets != 0:
                     turnover = revenue / total_assets
         except Exception as e_bs:
-             print(f"  [{ticker}] 貸借対照表の取得でエラー: {e_bs}")
-
-        roe = info.get('returnOnEquity')
-        div_yield = info.get('dividendYield')
-        margin = info.get('profitMargins')
+             print(f"  [{ticker}] 財務データ取得スキップ: {e_bs}")
 
         data = {
             "取得日時": fetch_time,
@@ -77,8 +82,8 @@ for ticker in tickers:
             "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
-            "利回(予)": round(div_yield * 100, 2) if div_yield else None,
-            "ROE(実)": round(roe * 100, 2) if roe else None,
+            "利回(予)": round(div_yield * 100, 2) if (div_yield := info.get('dividendYield')) else None,
+            "ROE(実)": round(roe * 100, 2) if (roe := info.get('returnOnEquity')) else None,
             "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
@@ -86,31 +91,32 @@ for ticker in tickers:
             "総資産": total_assets,
             "自己資本": equity,
             "自己資本比率": round(equity_ratio, 2) if equity_ratio else None,
-            "売上高利益率": round(margin * 100, 2) if margin else None,
+            "売上高利益率": round(margin * 100, 2) if (margin := info.get('profitMargins')) else None,
             "総資本回転率": round(turnover, 2) if turnover else None,
             "財務レバレッジ": round(leverage, 2) if leverage else None,
-            "移動平均乖離率(5d)": round(bias5, 2) if bias5 else None,
-            "移動平均乖離率(25d)": round(bias25, 2) if bias25 else None,
-            "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 else None,
-            "出来高(20d)": round(vol_ratio20, 2) if vol_ratio20 else None
+            "移動平均乖離率(5d)": round(bias5, 2) if bias5 is not None else None,
+            "移動平均乖離率(25d)": round(bias25, 2) if bias25 is not None else None,
+            "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 is not None else None,
+            "出来高(20d)": round(vol_ratio20, 2) if vol_ratio20 is not None else None
         }
         data_list.append(data)
-        print(f"  -> {ticker} の取得成功")
+        print(f"  -> {ticker} 取得成功")
         
     except Exception as e:
-        print(f"  -> 致命的なエラー発生 ({ticker}): {e}")
+        print(f"  -> 致命的なエラー ({ticker}): {e}")
     
-    # API制限を回避するため6秒待機
-    time.sleep(6)
+    # 【重要】レート制限回避
+    # 20件ごとに10秒休む。それ以外は1秒待機（トータル時間を短縮）
+    if (i + 1) % 20 == 0:
+        time.sleep(10)
+    else:
+        time.sleep(1)
 
-# データが1件以上あればCSVとして保存
+# 保存処理
+file_path = os.path.join(os.getcwd(), 'data.csv')
 if data_list:
-    df = pd.DataFrame(data_list)
-    # 現在のディレクトリに data.csv を保存することを明示
-    file_path = os.path.join(os.getcwd(), 'data.csv')
-    df.to_csv(file_path, index=False)
-    print(f"{file_path} を作成しました（合計 {len(data_list)} 件）")
+    pd.DataFrame(data_list).to_csv(file_path, index=False)
+    print(f"完了: {len(data_list)} 件のデータを保存しました。")
 else:
     print("データが取得できませんでした。")
-    empty_df = pd.DataFrame(columns=["銘柄CD", "銘柄名"])
-    empty_df.to_csv(os.path.join(os.getcwd(), 'data.csv'), index=False)
+    pd.DataFrame(columns=["銘柄CD", "銘柄名"]).to_csv(file_path, index=False)
