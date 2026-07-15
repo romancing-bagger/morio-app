@@ -20,7 +20,7 @@ if os.path.exists('data.csv'):
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
     # 2. インデックス設定
-    #df.set_index(["銘柄CD", "銘柄名"], inplace=True)
+    df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
     # 3. カラム設定（インデックスに対する設定と、データ列に対する設定を分ける）
     column_config = {
