@@ -19,15 +19,13 @@ if os.path.exists('data.csv'):
     # 列名の変更
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
-    # --- 修正点: インデックスにせず、列の順序だけ整える ---
-    # 銘柄CDと銘柄名を左端に寄せる
-    cols = ['銘柄CD', '銘柄名'] + [c for c in df.columns if c not in ['銘柄CD', '銘柄名']]
-    df = df[cols]
+    # 2. インデックス設定
+    #df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
-    # 2. カラム設定（すべての列を設定）
+    # 3. カラム設定（インデックスに対する設定と、データ列に対する設定を分ける）
     column_config = {
-        "銘柄CD": st.column_config.TextColumn("銘柄CD", disabled=True),
-        "銘柄名": st.column_config.TextColumn("銘柄名", disabled=True),
+        # インデックス列は名前で直接指定せず、インデックスの階層（Level 0, 1）として扱うか、
+        # あるいは設定をスキップするのが最も安定します。
         "直近株価": st.column_config.NumberColumn(format="￥%,d"),
         "目標株価": st.column_config.NumberColumn(format="￥%,d"),
         "PER(予)": st.column_config.NumberColumn(format="%.2f"),
@@ -38,13 +36,13 @@ if os.path.exists('data.csv'):
         key = f"{col}(百万)"
         column_config[key] = st.column_config.NumberColumn(format="%,d")
 
-    # 3. 画面表示
+    # 4. 画面表示
     st.data_editor(
         df,
         column_config=column_config,
         use_container_width=True,
         height=640,
-        hide_index=True  # インデックスを表示しない
+        hide_index=False  # インデックスを表示する設定に変更
     )
 else:
     st.warning("現在、裏側で初回データを取得中です。数分後にリロードしてください。")
