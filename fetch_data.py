@@ -123,7 +123,11 @@ for i, ticker in enumerate(tickers):
 # 保存処理
 file_path = os.path.join(os.getcwd(), 'data.csv')
 if data_list:
-    pd.DataFrame(data_list).to_csv(file_path, index=False)
+    df = pd.DataFrame(data_list)
+    file_path = os.path.join(os.getcwd(), 'data.csv')
+    df.to_csv(file_path, index=False)
+    # ファイルのタイムスタンプを強制的に現在時刻に更新
+    os.utime(file_path, None) 
     print(f"完了: {len(data_list)} 件のデータを保存しました。")
 else:
     print("データが取得できませんでした。")
