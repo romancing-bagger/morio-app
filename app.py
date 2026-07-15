@@ -25,13 +25,9 @@ if os.path.exists('data.csv'):
     # 表示用の列名を変更
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
-    # --- 列の並び替え ---
-    # 銘柄CD（indexにする）と銘柄名を左端に配置
-    cols = ['銘柄CD', '銘柄名'] + [c for c in df.columns if c not in ['銘柄CD', '銘柄名']]
-    df = df[cols]
-    
-    # 銘柄CDをインデックスに設定
-    df.set_index("銘柄CD", inplace=True)
+    # --- インデックス設定 ---
+    # 銘柄CD と 銘柄名 を両方インデックスに設定（＝横スクロール時に左側に固定）
+    df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
     # --- 画面表示 ---
     st.data_editor(
@@ -43,8 +39,7 @@ if os.path.exists('data.csv'):
             "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
             **{f"{col}(百万)": st.column_config.NumberColumn(format="%,d") for col in million_cols}
         },
-        # 銘柄名や主要項目を編集不可にする
-        disabled=["銘柄名", "セクター", "業界"],
+        # インデックス列は自動的に編集不可（固定）となります
         use_container_width=True,
         height=640
     )
