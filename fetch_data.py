@@ -54,30 +54,26 @@ for ticker in tickers:
         margin = info.get('profitMargins')
 
         data = {
-            "銘柄コード": ticker,
+            "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
-            "配当利回り(予)": round(div_yield * 100, 2) if div_yield else None,
+            "利回(予)": round(div_yield * 100, 2) if div_yield else None,
             "ROE(実)": round(roe * 100, 2) if roe else None,
-            "ROE(予)": None,
-            "自己資本比率": round(equity_ratio, 2) if equity_ratio else None,
-            "現在株価": current_price,
+            "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
-            "当期純利益": info.get('netIncomeToCommon'),
+            "当期純利": info.get('netIncomeToCommon'),
             "総資産": total_assets,
             "自己資本": equity,
-            "売上高当期利益率": round(margin * 100, 2) if margin else None,
+            "自己資本比率": round(equity_ratio, 2) if equity_ratio else None,
+            "売上高利益率": round(margin * 100, 2) if margin else None,
             "総資本回転率": round(turnover, 2) if turnover else None,
-            "財務レバレッジ": round(leverage, 2) if leverage else None,
-            "信用倍率": None,
-            "25日移動平均乖離率": round(bias25, 2) if bias25 else None,
-            "出来高(5日平均比)": round(vol_ratio5, 2) if vol_ratio5 else None,
-            "出来高率(20日平均比)": round(vol_ratio20, 2) if vol_ratio20 else None,
-            "短期投資評価": "-",
-            "中期投資評価": "-",
-            "長期投資評価": "-"
+            "財務レバ": round(leverage, 2) if leverage else None,
+            "移動平均乖離率(5d)": round(bias5, 2) if bias5 else None,
+            "移動平均乖離率(25d)": round(bias25, 2) if bias25 else None,
+            "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 else None,
+            "出来高(20d)": round(vol_ratio20, 2) if vol_ratio20 else None
         }
         data_list.append(data)
         print(f"  -> {ticker} の取得成功")
