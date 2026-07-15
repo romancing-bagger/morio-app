@@ -31,10 +31,10 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           
-          # 【重要】実行環境をクリーンにする（失敗の原因を排除）
+          # 【最重要】強制リセット：変更が残っていたら全て破棄して、GitHubの最新状態に合わせる
           git reset --hard HEAD
           
-          # 最新の状態を取り込む
+          # 最新の状態を取り込む（競合を避ける）
           git pull --rebase origin main
           
           # data.csv がある場合のみ処理
@@ -43,6 +43,6 @@ jobs:
             # 変更がある場合のみコミットしてプッシュ
             git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
           else
-            echo "data.csv が生成されていません"
+            echo "data.csv が見つかりません"
             exit 1
           fi
