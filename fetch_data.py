@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import os
 from datetime import datetime 
+import pytz 
 
 # tickers.txtから銘柄リストを読み込む
 try:
@@ -22,7 +23,8 @@ for ticker in tickers:
         hist = stock.history(period="3mo")
         sector = info.get('sector')
         industry = info.get('industry')
-        fetch_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        jst = pytz.timezone('Asia/Tokyo')
+        fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
         industry_jp = industry
         if "Semiconductor Equipment" in industry:
