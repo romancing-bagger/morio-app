@@ -2,9 +2,9 @@ name: Auto Fetch Stock Data
 
 on:
   schedule:
-    # 1時間ごとに自動実行する設定（UTC時間）
-    - cron: '10 * * * *'
-  workflow_dispatch: # 手動で実行できるボタンも追加
+    # 毎時10分に実行
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   update:
@@ -28,17 +28,21 @@ jobs:
         
       - name: Commit and push data.csv
         run: |
-              git config --global user.email "action@github.com"
-              git config --global user.name "GitHub Action"
-              
-              # 最新の状態を取り込む
-              git pull --rebase origin main
-              
-              # data.csv がある場合のみ処理
-              if [ -f "data.csv" ]; then
-                git add data.csv
-                # 変更があった時だけコミット
-                git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
-              else
-                echo "data.csv が見つかりません"
-              fi
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          
+          # 【重要】実行環境をクリーンにする（失敗の原因を排除）
+          git reset --hard HEAD
+          
+          # 最新の状態を取り込む
+          git pull --rebase origin main
+          
+          # data.csv がある場合のみ処理
+          if [ -f "data.csv" ]; then
+            git add data.csv
+            # 変更がある場合のみコミットしてプッシュ
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
+          else
+            echo "data.csv が生成されていません"
+            exit 1
+          fi
