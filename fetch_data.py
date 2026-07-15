@@ -43,11 +43,11 @@ for ticker in tickers:
             vol_today = hist['Volume'].iloc[-1]
             vol_avg5 = hist['Volume'].rolling(window=5).mean().iloc[-1]
             vol_ratio5 = vol_today / vol_avg5 if vol_avg5 > 0 else None
-            vol_avg25 = hist['Volume'].rolling(window=25).mean().iloc[-1]
-            vol_ratio25 = vol_today / vol_avg25 if vol_avg25 > 0 else None
+            vol_avg20 = hist['Volume'].rolling(window=20).mean().iloc[-1]
+            vol_ratio20 = vol_today / vol_avg20 if vol_avg20 > 0 else None
         else:
             current_price = info.get('currentPrice')
-            bias25, vol_ratio5, vol_ratio25 = None, None, None
+            bias25, vol_ratio5, vol_ratio20 = None, None, None
 
         total_assets, equity, equity_ratio, turnover, leverage = None, None, None, None, None
         try:
@@ -92,7 +92,7 @@ for ticker in tickers:
             "移動平均乖離率(5d)": round(bias5, 2) if bias5 else None,
             "移動平均乖離率(25d)": round(bias25, 2) if bias25 else None,
             "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 else None,
-            "出来高(25d)": round(vol_ratio25, 2) if vol_ratio25 else None
+            "出来高(20d)": round(vol_ratio20, 2) if vol_ratio20 else None
         }
         data_list.append(data)
         print(f"  -> {ticker} の取得成功")
