@@ -1,0 +1,35 @@
+name: Auto Fetch Stock Data
+
+on:
+  schedule:
+    # 1時間ごとに自動実行する設定（UTC時間）
+    - cron: '0 * * * *'
+  workflow_dispatch: # 手動で実行できるボタンも追加
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas
+          
+      - name: Fetch data
+        run: python fetch_data.py
+        
+      - name: Commit and push data.csv
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add data.csv
+          # データに変更があった場合のみ上書き保存してプッシュする
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
