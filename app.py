@@ -19,21 +19,19 @@ if os.path.exists('data.csv'):
     # 列名の変更
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
     
-    # 2. インデックス設定（これにより銘柄CDと銘柄名が固定される）
+    # 2. インデックス設定（銘柄CDと銘柄名が固定される）
     df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
-    # 3. カラム設定の準備（エラー防止のため、存在する列のみを辞書にする）
-    # インデックス化した列以外で、かつ百万単位の列だけを抽出して設定
-    target_million_cols = [f"{col}(百万)" for col in million_cols]
-    
+    # 3. カラム設定（インデックス以外のデータ列だけを指定）
     column_config_dict = {
         "直近株価": st.column_config.NumberColumn(format="￥%,d"),
         "目標株価": st.column_config.NumberColumn(format="￥%,d"),
         "PER(予)": st.column_config.NumberColumn(format="%.2f"),
         "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
     }
-    # 百万単位のカラムを追加
-    for col_name in target_million_cols:
+    # 百万単位の列も追加
+    for col in million_cols:
+        col_name = f"{col}(百万)"
         column_config_dict[col_name] = st.column_config.NumberColumn(format="%,d")
 
     # 4. 画面表示
