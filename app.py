@@ -35,7 +35,7 @@ if os.path.exists('data.csv'):
     st.data_editor(
         df,
         column_config={
-            "現在株価": st.column_config.NumberColumn(format="￥%,d"),
+            "直近株価": st.column_config.NumberColumn(format="￥%,d"),
             "目標株価": st.column_config.NumberColumn(format="￥%,d"),
             "PER(予)": st.column_config.NumberColumn(format="%.2f"),
             "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
