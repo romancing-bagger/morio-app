@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import time
 import os
+from datetime import datetime 
 
 # tickers.txtから銘柄リストを読み込む
 try:
