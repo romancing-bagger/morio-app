@@ -30,9 +30,14 @@ jobs:
         run: |
               git config --global user.email "action@github.com"
               git config --global user.name "GitHub Action"
-              # 変更：保存前に必ず最新情報を取得（pull）する
+              
+              # 【追加】中途半端な変更があれば強制的にリセットする
+              git reset --hard HEAD
+              
+              # 最新情報を取得（pull）
               git pull --rebase origin main
-              # 変更：ファイルの追加とコミット
+              
+              # ファイルの追加とコミット
               if [ -f data.csv ]; then
                 git add data.csv
                 git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
