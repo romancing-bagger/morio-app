@@ -1,9 +1,17 @@
 name: Auto Fetch Stock Data
 
 on:
-  # cronium: "0 8 0 0 *"
-  # cronium: '*/5 * * * *'
-  
+  schedule:
+    - cron: '0 23 * * *'
+    - cron: '0 0 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 2 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 4 * * *'
+    - cron: '0 5 * * *'
+    - cron: '0 6 * * *'
+    - cron: '0 7 * * *' 
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
