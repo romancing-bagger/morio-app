@@ -28,8 +28,14 @@ jobs:
         
       - name: Commit and push data.csv
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add data.csv
-          # データに変更があった場合のみ上書き保存してプッシュする
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
+              git config --global user.email "action@github.com"
+              git config --global user.name "GitHub Action"
+              # 変更：保存前に必ず最新情報を取得（pull）する
+              git pull --rebase origin main
+              # 変更：ファイルの追加とコミット
+              if [ -f data.csv ]; then
+                git add data.csv
+                git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data.csv" && git push)
+              else
+                echo "data.csv が生成されなかったため、スキップします。"
+              fi
