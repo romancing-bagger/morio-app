@@ -13,8 +13,7 @@ try:
             line = line.strip()
             if not line: continue
             
-            # maxsplit=2 で「銘柄CD」「銘柄名」「セクター」の最大3つに分割
-            # スペースが何個あっても、最初の2つの区切り以降はそのまま保持される
+            # maxsplit=2 で「銘柄CD」「銘柄名」「セクター」を取得
             parts = line.split(maxsplit=2)
             
             if len(parts) >= 1:
@@ -51,7 +50,7 @@ for i, entry in enumerate(tickers_list):
         hist = stock.history(period="3mo")
         fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
-        # 業界処理（yfinance取得データがあれば補完）
+        # 業界処理
         industry = info.get('industry', '-')
         industry_jp = industry
         if "Semiconductor Equipment" in industry:
@@ -77,6 +76,12 @@ for i, entry in enumerate(tickers_list):
         else:
             current_price = info.get('currentPrice')
 
+        # 利回り計算（dividendRate ÷ 現在株価 で自前算出）
+        dividend_rate = info.get('dividendRate')
+        yield_val = None
+        if dividend_rate and current_price and current_price > 0:
+            yield_val = round((dividend_rate / current_price) * 100, 2)
+
         # 財務データ処理
         total_assets, equity = None, None
         try:
@@ -99,13 +104,13 @@ for i, entry in enumerate(tickers_list):
         data = {
             "銘柄CD": ticker,
             "銘柄名": manual_name or info.get('shortName') or info.get('longName') or "-",
-            "取得日時": fetch_time,
             "セクター": manual_sector or info.get('sector') or "-",
+            "取得日時": fetch_time,
             "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "ROE(実)": round(roe * 100, 2) if (roe := info.get('returnOnEquity')) else None,
-            "利回(予)": round(div_yield * 100, 2) if (div_yield := info.get('dividendYield')) else None,
+            "利回(予)": yield_val,
             "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
