@@ -19,7 +19,9 @@ for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
         hist = stock.history(period="3mo")
-
+        sector = info.get('sector')
+        industry = info.get('industry')
+        
         if not hist.empty and len(hist) >= 25:
             current_price = hist['Close'].iloc[-1]
             sma5 = hist['Close'].rolling(window=5).mean().iloc[-1]
@@ -59,6 +61,7 @@ for ticker in tickers:
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
             "セクター": sector,
+            "業界": industry,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "利回(予)": round(div_yield * 100, 2) if div_yield else None,
