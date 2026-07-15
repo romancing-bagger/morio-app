@@ -99,13 +99,13 @@ for i, entry in enumerate(tickers_list):
         data = {
             "銘柄CD": ticker,
             "銘柄名": manual_name or info.get('shortName') or info.get('longName') or "-",
-            "セクター": manual_sector or info.get('sector') or "-",
             "取得日時": fetch_time,
+            "セクター": manual_sector or info.get('sector') or "-",
             "業界": industry_jp,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
-            "利回(予)": round(div_yield * 100, 2) if (div_yield := info.get('dividendYield')) else None,
             "ROE(実)": round(roe * 100, 2) if (roe := info.get('returnOnEquity')) else None,
+            "利回(予)": round(div_yield * 100, 2) if (div_yield := info.get('dividendYield')) else None,
             "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
@@ -118,8 +118,8 @@ for i, entry in enumerate(tickers_list):
             "財務レバレッジ": round(leverage, 2) if leverage else None,
             "移動平均乖離率(5d)": round(bias5, 2) if bias5 is not None else None,
             "移動平均乖離率(25d)": round(bias25, 2) if bias25 is not None else None,
-            "出来高(5d)": round(vol_ratio5, 2) if vol_ratio5 is not None else None,
-            "出来高(20d)": round(vol_ratio20, 2) if vol_ratio20 is not None else None
+            "出来高比(5d)": round(vol_ratio5, 2) if vol_ratio5 is not None else None,
+            "出来高比(20d)": round(vol_ratio20, 2) if vol_ratio20 is not None else None
         }
         data_list.append(data)
         print(f"  -> {ticker} 取得成功")
