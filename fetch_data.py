@@ -50,16 +50,6 @@ for i, entry in enumerate(tickers_list):
         hist = stock.history(period="3mo")
         fetch_time = datetime.now(jst).strftime("%m-%d %H:%M")
 
-        # 業界処理
-        industry = info.get('industry', '-')
-        industry_jp = industry
-        if "Semiconductor Equipment" in industry:
-            industry_jp = "装置・材料"
-        elif "Semiconductors" in industry:
-            industry_jp = "半導体メーカー"
-        elif "Electronic Components" in industry:
-            industry_jp = "電子部品"
-        
         # 株価計算
         current_price = None
         if not hist.empty and len(hist) >= 25:
@@ -101,9 +91,8 @@ for i, entry in enumerate(tickers_list):
         data = {
             "銘柄CD": ticker,
             "銘柄名": manual_name or info.get('shortName') or info.get('longName') or "-",
-            "セクター": manual_sector or info.get('sector') or "-",
             "取得日時": fetch_time,
-            "業界": industry_jp,
+            "セクター": manual_sector or info.get('sector') or "-",
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "ROE(実)": round(roe * 100, 2) if (roe := info.get('returnOnEquity')) else None,
