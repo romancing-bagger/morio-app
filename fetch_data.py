@@ -57,6 +57,7 @@ for ticker in tickers:
         data = {
             "銘柄CD": ticker,
             "銘柄名": info.get('shortName') or info.get('longName') or "-",
+            "セクター": sector,
             "PER(予)": info.get('forwardPE'),
             "PBR(実)": info.get('priceToBook'),
             "利回(予)": round(div_yield * 100, 2) if div_yield else None,
