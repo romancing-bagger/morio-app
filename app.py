@@ -22,22 +22,23 @@ if os.path.exists('data.csv'):
     # 2. インデックス設定（銘柄CDと銘柄名が固定される）
     df.set_index(["銘柄CD", "銘柄名"], inplace=True)
     
-    # 3. カラム設定（インデックス以外のデータ列だけを指定）
-    column_config_dict = {
+    # 3. カラム設定（インデックスに含まれていない「データ列」のみを指定する）
+    column_config = {
         "直近株価": st.column_config.NumberColumn(format="￥%,d"),
         "目標株価": st.column_config.NumberColumn(format="￥%,d"),
         "PER(予)": st.column_config.NumberColumn(format="%.2f"),
         "PBR(実)": st.column_config.NumberColumn(format="%.2f"),
     }
-    # 百万単位の列も追加
+    
+    # 百万単位の列の設定を追加
     for col in million_cols:
-        col_name = f"{col}(百万)"
-        column_config_dict[col_name] = st.column_config.NumberColumn(format="%,d")
+        key = f"{col}(百万)"
+        column_config[key] = st.column_config.NumberColumn(format="%,d")
 
     # 4. 画面表示
     st.data_editor(
         df,
-        column_config=column_config_dict,
+        column_config=column_config,
         use_container_width=True,
         height=640
     )
