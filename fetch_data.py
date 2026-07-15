@@ -101,8 +101,7 @@ for ticker in tickers:
         print(f"  -> 致命的なエラー発生 ({ticker}): {e}")
     
     # API制限を回避するため6秒待機
-    if (i + 1) % 20 == 0:
-        time.sleep(10)
+    time.sleep(6)
 
 # データが1件以上あればCSVとして保存
 if data_list:
