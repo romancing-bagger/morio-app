@@ -42,7 +42,7 @@ if os.path.exists('data.csv'):
             # 百万単位のカラムもカンマ付きに
             **{f"{col}(百万)": st.column_config.NumberColumn(format="%,d") for col in million_cols}
         },
-        use_container_width=True
+        use_container_width=True,
         height=1200
     )
 else:
