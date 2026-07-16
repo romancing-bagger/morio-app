@@ -1,0 +1,11 @@
+name: Test Cron
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # 5分ごとに発火させる（テスト用）
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Cron is working!"
