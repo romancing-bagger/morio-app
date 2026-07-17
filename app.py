@@ -25,7 +25,7 @@ if os.path.exists('data.csv'):
         df[col] = df[col].apply(to_millions).round(0)
     
     # 表示用の列名を変更
-    df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
+    df = df.rename(columns={col: f"{col}(M)" for col in million_cols})
     
     # --- 画面表示 ---
     # インデックスを銘柄CDに設定
