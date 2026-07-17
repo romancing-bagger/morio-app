@@ -100,7 +100,7 @@ for i, entry in enumerate(tickers_list):
             "直近株価": current_price,
             "目標株価": info.get('targetMeanPrice'),
             "売上高": info.get('totalRevenue'),
-            "出来高": f"{vol_today:,}" if vol_today is not None else "0",
+            "出来高": int(vol_today) if vol_today is not None else "0",
             "-比(5d)": round(vol_ratio5, 2) if vol_ratio5 is not None else None,
             "-比(20d)": round(vol_ratio20, 2) if vol_ratio20 is not None else None,
             "乖離率(5d)": round(bias5, 2) if bias5 is not None else None,
