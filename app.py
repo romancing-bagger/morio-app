@@ -15,17 +15,27 @@ if os.path.exists('data.csv'):
     def to_millions(x):
         return x / 1000000 if pd.notnull(x) else None
 
+    def to_kiros(x):
+        return x / 1000 if pd.notnull(x) else None
+    
     # 各列のフォーマットを適用
     df['PER(予)'] = df['PER(予)'].round(2)
     df['PBR(実)'] = df['PBR(実)'].round(2)
     
     # 100万単位に変換（対象カラムを指定）
-    million_cols = ['出来高','売上高', '当期純利益', '総資産', '自己資本']
+    million_cols = ['売上高', '当期純利益', '総資産', '自己資本']
     for col in million_cols:
         df[col] = df[col].apply(to_millions).round(0)
     
     # 表示用の列名を変更
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
+
+    kiro_cols = ['出来高']
+    for col in million_cols:
+        df[col] = df[col].apply(to_kiros).round(0)
+    
+    # 表示用の列名を変更
+    df = df.rename(columns={col: f"{col}(k)" for col in kiro_cols})
     
     # --- 画面表示 ---
     # インデックスを銘柄CDに設定
