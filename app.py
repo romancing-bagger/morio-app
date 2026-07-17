@@ -23,7 +23,7 @@ if os.path.exists('data.csv'):
     df['PBR(実)'] = df['PBR(実)'].round(2)
     
     # 100万単位に変換（対象カラムを指定）
-    million_cols = ['売上高', '当期純利益', '総資産', '自己資本']
+    million_cols = ['売上高', '純利', '総資産', '自己資本']
     for col in million_cols:
         df[col] = df[col].apply(to_millions).round(0)
     
