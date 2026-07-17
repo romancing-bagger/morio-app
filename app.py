@@ -31,7 +31,7 @@ if os.path.exists('data.csv'):
     df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
 
     kiro_cols = ['出来高']
-    for col in million_cols:
+    for col in kiro_cols:
         df[col] = df[col].apply(to_kiros).round(0)
     
     # 表示用の列名を変更
