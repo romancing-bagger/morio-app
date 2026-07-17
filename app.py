@@ -28,7 +28,7 @@ if os.path.exists('data.csv'):
         df[col] = df[col].apply(to_millions).round(0)
     
     # 表示用の列名を変更
-    df = df.rename(columns={col: f"{col}(百万)" for col in million_cols})
+    df = df.rename(columns={col: f"{col}(M)" for col in million_cols})
 
     kiro_cols = ['出来高']
     for col in kiro_cols:
@@ -51,7 +51,11 @@ if os.path.exists('data.csv'):
     
     # 百万単位のカラム設定を追加
     for col in million_cols:
-        config[f"{col}(百万)"] = st.column_config.NumberColumn(format="%,d")
+        config[f"{col}(M)"] = st.column_config.NumberColumn(format="%,d")
+
+        # 百万単位のカラム設定を追加
+    for col in kiro_cols:
+        config[f"{col}(k)"] = st.column_config.NumberColumn(format="%,d")
     
     # 画面表示
     st.data_editor(
